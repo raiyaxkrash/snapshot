@@ -27,10 +27,16 @@ pub(crate) fn trigger_capture(app: AppHandle, mode: String) {
         return;
     }
     std::thread::spawn(move || {
+        let mut was_visible = false;
         if let Some(w) = app.get_webview_window("overlay") {
-            let _ = w.hide();
+            was_visible = w.is_visible().unwrap_or(false);
+            if was_visible {
+                let _ = w.hide();
+            }
         }
-        std::thread::sleep(std::time::Duration::from_millis(60));
+        if was_visible {
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
         if let Some(shot) = capture::capture_virtual_screen() {
             if let Some(w) = app.get_webview_window("overlay") {
                 let _ = w.set_position(PhysicalPosition::new(shot.x, shot.y));
