@@ -16,7 +16,7 @@
   <a href="README.md">🇷🇺 Русский</a> &nbsp;·&nbsp; <b>🇬🇧 English</b>
 </p>
 
-<a href="https://github.com/raiyaxkrash/snapshot/releases/latest/download/SnapShot-0.1.1-x64-setup.exe"><img src="https://img.shields.io/badge/⬇_Download_Installer_(v0.1.1)-x64_.exe-BF5AF2?style=for-the-badge" alt="Download Installer"></a>&nbsp;&nbsp;<a href="https://github.com/raiyaxkrash/snapshot/releases/latest/download/snapshot-0.1.1-x64-portable.exe"><img src="https://img.shields.io/badge/📦_Portable_Executable-No_Install-2C2C2E?style=for-the-badge" alt="Download Portable"></a>
+<a href="https://github.com/raiyaxkrash/snapshot/releases/latest/download/SnapShot-0.1.2-x64-setup.exe"><img src="https://img.shields.io/badge/⬇_Download_Installer_(v0.1.2)-x64_.exe-BF5AF2?style=for-the-badge" alt="Download Installer"></a>&nbsp;&nbsp;<a href="https://github.com/raiyaxkrash/snapshot/releases/latest/download/snapshot-0.1.2-x64-portable.exe"><img src="https://img.shields.io/badge/📦_Portable_Executable-No_Install-2C2C2E?style=for-the-badge" alt="Download Portable"></a>
 
 </div>
 

@@ -1,6 +1,7 @@
 (() => {
-  const { invoke } = window.__TAURI__.core;
-  const { listen } = window.__TAURI__.event;
+  const tauri = window.__TAURI__;
+  const invoke = tauri ? tauri.core.invoke : async () => {};
+  const listen = tauri ? tauri.event.listen : () => {};
 
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -168,7 +169,7 @@
       dimBadge.hidden = false;
       dimBadge.textContent = `${Math.round(sel.w * dpr)} × ${Math.round(sel.h * dpr)}`;
       dimBadge.style.left = Math.max(8, beautify ? sel.x - 26 : sel.x) + 'px';
-      dimBadge.style.top = Math.max(8, (beautify ? sel.y - 26 : sel.y) - 28) + 'px';
+      dimBadge.style.top = Math.max(8, (beautify ? sel.y - 26 : sel.y) - 34) + 'px';
     } else {
       dimBadge.hidden = true;
     }
@@ -177,13 +178,14 @@
   function placeToolbar() {
     if (!sel || sel.w < 4 || sel.h < 4) { toolbar.hidden = true; return; }
     toolbar.hidden = false;
-    const tw = toolbar.offsetWidth || 460;
-    const left = Math.min(window.innerWidth - tw - 12, Math.max(12, sel.x + sel.w - tw));
+    const tw = toolbar.offsetWidth || 500;
     const pad = beautify ? 26 : 0;
-    const below = sel.y + sel.h + pad + 12;
-    const top = below + 46 < window.innerHeight ? below : Math.max(12, sel.y - pad - 48);
-    toolbar.style.left = left + 'px';
-    toolbar.style.top = top + 'px';
+    const centerLeft = sel.x + (sel.w - tw) / 2;
+    const left = Math.min(window.innerWidth - tw - 12, Math.max(12, centerLeft));
+    const below = sel.y + sel.h + pad + 14;
+    const top = below + 46 < window.innerHeight ? below : Math.max(12, sel.y - pad - 54);
+    toolbar.style.left = Math.round(left) + 'px';
+    toolbar.style.top = Math.round(top) + 'px';
   }
 
   function exportPngDataUrl() {
@@ -374,4 +376,53 @@
     };
     img.src = screen.image;
   });
+
+  // Режим предпросмотра в обычном браузере (вне Tauri) для визуальной проверки редактора.
+  if (!tauri) {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const cardW = Math.min(680, Math.round(W * 0.56));
+    const cardH = Math.min(300, Math.round(H * 0.44));
+    const cardX = Math.round((W - cardW) / 2);
+    const cardY = Math.round((H - cardH) / 2) - 24;
+
+    const demo = document.createElement('canvas');
+    demo.width = W;
+    demo.height = H;
+    const dc = demo.getContext('2d');
+    const bg = dc.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0f172a');
+    bg.addColorStop(1, '#1e1b4b');
+    dc.fillStyle = bg;
+    dc.fillRect(0, 0, W, H);
+    dc.fillStyle = '#141720';
+    dc.beginPath();
+    dc.roundRect(cardX, cardY, cardW, cardH, 12);
+    dc.fill();
+    dc.fillStyle = '#f5f5f7';
+    dc.font = '600 19px "Segoe UI", sans-serif';
+    dc.fillText('SnapShot — Live Canvas Editor', cardX + 28, cardY + 52);
+    dc.fillStyle = '#cbd5e1';
+    dc.font = '14.5px Consolas, monospace';
+    dc.fillText('fn capture_virtual_screen() -> Option<ScreenCapture>', cardX + 28, cardY + 104);
+    dc.fillText('let ocr = OcrEngine::TryCreateFromUserProfileLanguages()?;', cardX + 28, cardY + 138);
+    dc.fillText('API_SECRET = "sk-live-9876543210-hidden";', cardX + 28, cardY + 172);
+
+    const img = new Image();
+    img.onload = () => {
+      bgImg = img;
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      sel = { x: cardX, y: cardY, w: cardW, h: cardH };
+      beautify = true;
+      beautifyBtn.classList.add('active');
+      phase = 'editing';
+      hint.hidden = true;
+      shapes = [{ type: 'arrow', color: '#ff375f', x1: cardX + 420, y1: cardY + 230, x2: cardX + 340, y2: cardY + 182 }];
+      redraw();
+      placeToolbar();
+    };
+    img.src = demo.toDataURL('image/png');
+  }
 })();
