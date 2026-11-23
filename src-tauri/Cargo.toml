@@ -1,6 +1,6 @@
 [package]
 name = "snapshot"
-version = "0.1.0"
+version = "0.1.1"
 description = "SnapShot — современный скриншотер для Windows с редактором, Beautify и оффлайн OCR"
 edition = "2021"
 publish = false

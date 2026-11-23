@@ -112,23 +112,63 @@
     ctx.fillRect(0, 0, cw, ch);
 
     if (sel && sel.w > 2 && sel.h > 2) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(sel.x, sel.y, sel.w, sel.h);
-      ctx.clip();
-      ctx.drawImage(bgImg, 0, 0, cw, ch);
-      for (const s of shapes) drawShape(ctx, s, 0, 0, dpr);
-      if (drawing) drawShape(ctx, drawing, 0, 0, dpr);
-      ctx.restore();
+      if (beautify) {
+        const pad = 26;
+        const bx = sel.x - pad;
+        const by = sel.y - pad;
+        const bw = sel.w + pad * 2;
+        const bh = sel.h + pad * 2;
+        const grad = ctx.createLinearGradient(bx, by, bx + bw, by + bh);
+        grad.addColorStop(0, '#667eea');
+        grad.addColorStop(0.5, '#764ba2');
+        grad.addColorStop(1, '#f093fb');
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bw, bh, 16);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(191, 90, 242, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
 
-      ctx.strokeStyle = beautify ? '#bf5af2' : '#0a84ff';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.48)';
+        ctx.shadowBlur = 28;
+        ctx.shadowOffsetY = 10;
+        ctx.beginPath();
+        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 12);
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 12);
+        ctx.clip();
+        ctx.drawImage(bgImg, 0, 0, cw, ch);
+        for (const s of shapes) drawShape(ctx, s, 0, 0, dpr);
+        if (drawing) drawShape(ctx, drawing, 0, 0, dpr);
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(sel.x, sel.y, sel.w, sel.h);
+        ctx.clip();
+        ctx.drawImage(bgImg, 0, 0, cw, ch);
+        for (const s of shapes) drawShape(ctx, s, 0, 0, dpr);
+        if (drawing) drawShape(ctx, drawing, 0, 0, dpr);
+        ctx.restore();
+
+        ctx.strokeStyle = '#7c5cff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+      }
 
       dimBadge.hidden = false;
       dimBadge.textContent = `${Math.round(sel.w * dpr)} × ${Math.round(sel.h * dpr)}`;
-      dimBadge.style.left = Math.max(8, sel.x) + 'px';
-      dimBadge.style.top = Math.max(8, sel.y - 28) + 'px';
+      dimBadge.style.left = Math.max(8, beautify ? sel.x - 26 : sel.x) + 'px';
+      dimBadge.style.top = Math.max(8, (beautify ? sel.y - 26 : sel.y) - 28) + 'px';
     } else {
       dimBadge.hidden = true;
     }
@@ -139,8 +179,9 @@
     toolbar.hidden = false;
     const tw = toolbar.offsetWidth || 460;
     const left = Math.min(window.innerWidth - tw - 12, Math.max(12, sel.x + sel.w - tw));
-    const below = sel.y + sel.h + 10;
-    const top = below + 46 < window.innerHeight ? below : Math.max(12, sel.y - 48);
+    const pad = beautify ? 26 : 0;
+    const below = sel.y + sel.h + pad + 12;
+    const top = below + 46 < window.innerHeight ? below : Math.max(12, sel.y - pad - 48);
     toolbar.style.left = left + 'px';
     toolbar.style.top = top + 'px';
   }
@@ -289,6 +330,7 @@
       beautify = !beautify;
       beautifyBtn.classList.toggle('active', beautify);
       redraw();
+      placeToolbar();
     } else if (a === 'undo') {
       shapes.pop();
       redraw();
