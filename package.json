@@ -1,0 +1,14 @@
+{
+  "name": "snapshot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SnapShot — современный скриншотер для Windows: редактор, Beautify-фон, размытие паролей и оффлайн OCR",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

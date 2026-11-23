@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Default capability for SnapShot","local":true,"windows":["overlay","pin-*"],"permissions":["core:default","core:event:default","core:window:default"]}}

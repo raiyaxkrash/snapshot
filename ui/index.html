@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SnapShot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="dim-badge" id="dimBadge" hidden>0 × 0</div>
+
+  <div class="toolbar" id="toolbar" hidden>
+    <div class="group">
+      <button type="button" class="tbtn active" data-tool="arrow" title="Стрелка">↗</button>
+      <button type="button" class="tbtn" data-tool="rect" title="Рамка">□</button>
+      <button type="button" class="tbtn" data-tool="pen" title="Карандаш">✎</button>
+      <button type="button" class="tbtn" data-tool="blur" title="Размытие / скрыть пароль">▦</button>
+      <button type="button" class="tbtn" id="beautifyBtn" data-a="beautify" title="Beautify: красивый фон и тень">✨</button>
+      <button type="button" class="tbtn" data-a="undo" title="Отменить (Ctrl+Z)">↶</button>
+    </div>
+    <span class="sep"></span>
+    <div class="group colors" id="colors">
+      <button type="button" class="cdot active" data-color="#ff375f"></button>
+      <button type="button" class="cdot" data-color="#ff9f0a"></button>
+      <button type="button" class="cdot" data-color="#30d158"></button>
+      <button type="button" class="cdot" data-color="#0a84ff"></button>
+      <button type="button" class="cdot" data-color="#ffffff"></button>
+    </div>
+    <span class="sep"></span>
+    <div class="group">
+      <button type="button" class="abtn" data-a="ocr" title="Распознать текст (OCR)">OCR</button>
+      <button type="button" class="abtn" data-a="save" title="Сохранить в Pictures\SnapShot (Ctrl+S)">Сохранить</button>
+      <button type="button" class="abtn primary" data-a="copy" title="Копировать в буфер (Enter / Ctrl+C)">Копировать</button>
+      <button type="button" class="tbtn" data-a="cancel" title="Отмена (Esc)">✕</button>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">Выделите область мышью · Esc — отмена</div>
+  <script src="app.js"></script>
+</body>
+</html>
