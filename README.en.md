@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="assets/banner.jpg" alt="SnapShot for Windows" width="100%">
+
+<br>
+
 <h1>📸 SnapShot</h1>
 <p><b>Modern, lightweight <code>PrintScreen</code> screenshot & offline OCR tool for Windows 10 / 11</b><br>Crisp 1:1 DPI capture, built-in editor with blur & arrows, CleanShot-style Beautify, and offline WinRT OCR.</p>
 

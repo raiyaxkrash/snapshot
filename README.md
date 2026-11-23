@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="assets/banner.jpg" alt="SnapShot для Windows" width="100%">
+
+<br>
+
 <h1>📸 SnapShot</h1>
 <p><b>Современный, лёгкий <code>PrintScreen</code> скриншотер и оффлайн OCR для Windows 10 / 11</b><br>Мгновенный захват 1:1 DPI, редактор со стрелками и размытием паролей, Beautify-фон и распознавание текста без интернета.</p>
 
