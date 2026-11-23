@@ -16,7 +16,7 @@
   let phase = 'idle';   // 'idle' | 'selecting' | 'editing'
   let sel = null;       // { x, y, w, h } in CSS px
   let tool = 'arrow';
-  let color = '#ff375f';
+  let color = '#e5484d';
   let beautify = false;
   let shapes = [];
   let drawing = null;
@@ -102,6 +102,26 @@
     }
   }
 
+  function drawViewfinderBrackets(c, x, y, w, h) {
+    const len = Math.min(12, Math.floor(Math.min(w, h) / 4));
+    if (len < 4) return;
+    c.save();
+    c.strokeStyle = '#e59a3c';
+    c.lineWidth = 2;
+    c.lineCap = 'square';
+    c.beginPath();
+    // Top-left
+    c.moveTo(x, y + len); c.lineTo(x, y); c.lineTo(x + len, y);
+    // Top-right
+    c.moveTo(x + w - len, y); c.lineTo(x + w, y); c.lineTo(x + w, y + len);
+    // Bottom-right
+    c.moveTo(x + w, y + h - len); c.lineTo(x + w, y + h); c.lineTo(x + w - len, y + h);
+    // Bottom-left
+    c.moveTo(x + len, y + h); c.lineTo(x, y + h); c.lineTo(x, y + h - len);
+    c.stroke();
+    c.restore();
+  }
+
   function redraw() {
     if (!bgImg) return;
     const cw = canvas.width / dpr;
@@ -109,47 +129,54 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.drawImage(bgImg, 0, 0, cw, ch);
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.52)';
     ctx.fillRect(0, 0, cw, ch);
 
     if (sel && sel.w > 2 && sel.h > 2) {
       if (beautify) {
-        const pad = 26;
+        const pad = 28;
         const bx = sel.x - pad;
         const by = sel.y - pad;
         const bw = sel.w + pad * 2;
         const bh = sel.h + pad * 2;
         const grad = ctx.createLinearGradient(bx, by, bx + bw, by + bh);
-        grad.addColorStop(0, '#667eea');
-        grad.addColorStop(0.5, '#764ba2');
-        grad.addColorStop(1, '#f093fb');
+        grad.addColorStop(0, '#2c2c30');
+        grad.addColorStop(1, '#171719');
         ctx.save();
         ctx.beginPath();
         ctx.roundRect(bx, by, bw, bh, 16);
         ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = 'rgba(191, 90, 242, 0.85)';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(237, 237, 237, 0.14)';
+        ctx.lineWidth = 1;
         ctx.stroke();
         ctx.restore();
 
         ctx.save();
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.48)';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.56)';
         ctx.shadowBlur = 28;
-        ctx.shadowOffsetY = 10;
+        ctx.shadowOffsetY = 12;
         ctx.beginPath();
-        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 12);
+        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 8);
         ctx.fillStyle = '#000';
         ctx.fill();
         ctx.restore();
 
         ctx.save();
         ctx.beginPath();
-        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 12);
+        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 8);
         ctx.clip();
         ctx.drawImage(bgImg, 0, 0, cw, ch);
         for (const s of shapes) drawShape(ctx, s, 0, 0, dpr);
         if (drawing) drawShape(ctx, drawing, 0, 0, dpr);
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(sel.x, sel.y, sel.w, sel.h, 8);
+        ctx.strokeStyle = 'rgba(237, 237, 237, 0.10)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
         ctx.restore();
       } else {
         ctx.save();
@@ -161,15 +188,16 @@
         if (drawing) drawShape(ctx, drawing, 0, 0, dpr);
         ctx.restore();
 
-        ctx.strokeStyle = '#7c5cff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+        ctx.strokeStyle = 'rgba(237, 237, 237, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(sel.x + 0.5, sel.y + 0.5, sel.w - 1, sel.h - 1);
+        drawViewfinderBrackets(ctx, sel.x, sel.y, sel.w, sel.h);
       }
 
       dimBadge.hidden = false;
       dimBadge.textContent = `${Math.round(sel.w * dpr)} × ${Math.round(sel.h * dpr)}`;
-      dimBadge.style.left = Math.max(8, beautify ? sel.x - 26 : sel.x) + 'px';
-      dimBadge.style.top = Math.max(8, (beautify ? sel.y - 26 : sel.y) - 34) + 'px';
+      dimBadge.style.left = Math.max(8, beautify ? sel.x - 28 : sel.x) + 'px';
+      dimBadge.style.top = Math.max(8, (beautify ? sel.y - 28 : sel.y) - 32) + 'px';
     } else {
       dimBadge.hidden = true;
     }
@@ -178,12 +206,12 @@
   function placeToolbar() {
     if (!sel || sel.w < 4 || sel.h < 4) { toolbar.hidden = true; return; }
     toolbar.hidden = false;
-    const tw = toolbar.offsetWidth || 500;
-    const pad = beautify ? 26 : 0;
+    const tw = toolbar.offsetWidth || 520;
+    const pad = beautify ? 28 : 0;
     const centerLeft = sel.x + (sel.w - tw) / 2;
     const left = Math.min(window.innerWidth - tw - 12, Math.max(12, centerLeft));
-    const below = sel.y + sel.h + pad + 14;
-    const top = below + 46 < window.innerHeight ? below : Math.max(12, sel.y - pad - 54);
+    const below = sel.y + sel.h + pad + 12;
+    const top = below + 48 < window.innerHeight ? below : Math.max(12, sel.y - pad - 52);
     toolbar.style.left = Math.round(left) + 'px';
     toolbar.style.top = Math.round(top) + 'px';
   }
@@ -205,15 +233,14 @@
     if (!beautify) return raw.toDataURL('image/png');
 
     const pad = Math.round(36 * dpr);
-    const rad = Math.round(14 * dpr);
+    const rad = Math.round(10 * dpr);
     const out = document.createElement('canvas');
     out.width = pw + pad * 2;
     out.height = ph + pad * 2;
     const octx = out.getContext('2d');
     const grad = octx.createLinearGradient(0, 0, out.width, out.height);
-    grad.addColorStop(0, '#667eea');
-    grad.addColorStop(0.5, '#764ba2');
-    grad.addColorStop(1, '#f093fb');
+    grad.addColorStop(0, '#2c2c30');
+    grad.addColorStop(1, '#171719');
     octx.fillStyle = grad;
     octx.fillRect(0, 0, out.width, out.height);
 
@@ -342,6 +369,15 @@
     else if (a === 'cancel') invoke('cancel_capture').catch(() => {});
   });
 
+  window.addEventListener('resize', () => {
+    if (!bgImg) return;
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    redraw();
+    if (phase === 'editing') placeToolbar();
+  });
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') invoke('cancel_capture').catch(() => {});
     else if (e.key === 'Enter' && phase === 'editing') doCopy();
@@ -362,9 +398,9 @@
     toolbar.hidden = true;
     dimBadge.hidden = true;
     hint.hidden = false;
-    hint.textContent = mode === 'ocr'
-      ? 'Выделите область с текстом для OCR · Esc — отмена'
-      : 'Выделите область мышью · Esc — отмена';
+    hint.innerHTML = mode === 'ocr'
+      ? '<span>Выделите область с текстом</span><kbd>Esc</kbd><span>отмена</span>'
+      : '<span>Выделите область</span><kbd>Esc</kbd><span>отмена</span>';
 
     const img = new Image();
     img.onload = () => {
@@ -390,23 +426,20 @@
     demo.width = W;
     demo.height = H;
     const dc = demo.getContext('2d');
-    const bg = dc.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#0f172a');
-    bg.addColorStop(1, '#1e1b4b');
-    dc.fillStyle = bg;
+    dc.fillStyle = '#0f0f10';
     dc.fillRect(0, 0, W, H);
-    dc.fillStyle = '#141720';
+    dc.fillStyle = '#19191b';
     dc.beginPath();
-    dc.roundRect(cardX, cardY, cardW, cardH, 12);
+    dc.roundRect(cardX, cardY, cardW, cardH, 10);
     dc.fill();
-    dc.fillStyle = '#f5f5f7';
-    dc.font = '600 19px "Segoe UI", sans-serif';
-    dc.fillText('SnapShot — Live Canvas Editor', cardX + 28, cardY + 52);
-    dc.fillStyle = '#cbd5e1';
-    dc.font = '14.5px Consolas, monospace';
-    dc.fillText('fn capture_virtual_screen() -> Option<ScreenCapture>', cardX + 28, cardY + 104);
-    dc.fillText('let ocr = OcrEngine::TryCreateFromUserProfileLanguages()?;', cardX + 28, cardY + 138);
-    dc.fillText('API_SECRET = "sk-live-9876543210-hidden";', cardX + 28, cardY + 172);
+    dc.fillStyle = '#ededed';
+    dc.font = '500 18px "Segoe UI Variable Text", "Segoe UI", sans-serif';
+    dc.fillText('SnapShot — capture.rs', cardX + 24, cardY + 48);
+    dc.fillStyle = '#a1a1a6';
+    dc.font = '14px "Cascadia Mono", Consolas, monospace';
+    dc.fillText('fn capture_virtual_screen() -> Option<ScreenCapture>', cardX + 24, cardY + 96);
+    dc.fillText('let ocr = OcrEngine::TryCreateFromUserProfileLanguages()?;', cardX + 24, cardY + 128);
+    dc.fillText('API_SECRET = "sk-live-9876543210-hidden";', cardX + 24, cardY + 160);
 
     const img = new Image();
     img.onload = () => {
@@ -415,11 +448,10 @@
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       sel = { x: cardX, y: cardY, w: cardW, h: cardH };
-      beautify = true;
-      beautifyBtn.classList.add('active');
+      beautify = false;
       phase = 'editing';
       hint.hidden = true;
-      shapes = [{ type: 'arrow', color: '#ff375f', x1: cardX + 420, y1: cardY + 230, x2: cardX + 340, y2: cardY + 182 }];
+      shapes = [{ type: 'arrow', color: '#e5484d', x1: cardX + 420, y1: cardY + 224, x2: cardX + 340, y2: cardY + 172 }];
       redraw();
       placeToolbar();
     };
